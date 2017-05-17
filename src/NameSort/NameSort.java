@@ -1,3 +1,5 @@
+package NameSort;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -21,6 +23,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -48,6 +51,7 @@ import javafx.stage.Stage;
  * 
  * Log:
  * 05/13/2017 BK Finished making JavaFX GUI form
+ * 05/15/2017 BK Done separating last names and first names
  */
 public class NameSort extends Application {
     BorderPane pane = new BorderPane();
@@ -65,7 +69,7 @@ public class NameSort extends Application {
         primaryStage.setMinWidth(200);
         primaryStage.setMinHeight(500);        
         primaryStage.setTitle("Name Sorter -- by Boram Kim");
-        primaryStage.getIcons().add(new Image("list.jpg"));
+        primaryStage.getIcons().add(new Image("list.png"));
         primaryStage.setScene(scene);
         primaryStage.show();
        
@@ -120,11 +124,23 @@ public class NameSort extends Application {
         Label label = new Label("Sort by: ");
         gridPane.add(label, 19, 0);
         // radio buttons
-        RadioButton firstNameRB = new RadioButton();
-        firstNameRB.setText("First Name");
-        RadioButton lastNameRB = new RadioButton("Last Name");        
+        // "Only one RadioButton can be selected when placed in a ToggleGroup"
+        ToggleGroup group = new ToggleGroup();  
+        RadioButton firstNameRB = new RadioButton("First Name");
+        //firstNameRB.setText("First Name");
+        firstNameRB.setToggleGroup(group);
+        RadioButton lastNameRB = new RadioButton("Last Name"); 
+        lastNameRB.setToggleGroup(group);
         gridPane.add(firstNameRB, 20, 0); // <------- need to be aligned to the right
         gridPane.add(lastNameRB, 21, 0);
+        
+        firstNameRB.setOnAction((ActionEvent t) -> {
+            Name.setName("byFirst");  // the string literal in the argument is
+                // set as constant in the Name class 
+        });
+        lastNameRB.setOnAction((ActionEvent t) -> {
+             Name.setName("byLast");        
+        });
         
         return gridPane;
     }
@@ -144,6 +160,7 @@ public class NameSort extends Application {
         
         stackPane.getChildren().add(textArea);
         stackPane.setAlignment(Pos.CENTER);
+        
         // Removing an empty line:
         // usign Iterator to avoid ConcurrentModificationException by removing
         // an element in an ArrayList
@@ -165,7 +182,7 @@ public class NameSort extends Application {
 //            System.out.println(s);
         // Isolate the last name    
         ArrayList<String> lastNames = new ArrayList<>();
-        ArrayList<String> firstNames = new ArrayList<>();        
+        ArrayList<String> firstNames = new ArrayList<>();   
         for (String str2: al)
         {
             try
@@ -193,17 +210,18 @@ public class NameSort extends Application {
             catch (NullPointerException e){}
         }
         // test printing
-        for (String a: lastNames)
-            textArea.appendText(a + "\n");//  System.out.println("Last name: " + a);
-        for (String b: firstNames)
-              textArea.appendText(b + "\n");//  System.out.println("First name: " + b);
-        
+        for (String fn: firstNames)
+        {    textArea.appendText(fn + "\n");//  System.out.println("Last name: " + a);
+            for (String ln: lastNames)
+            {     
+              textArea.appendText(ln + "\n");
+              Name nameObj = new Name(fn, ln);
+            }
+        }         
         // now sort!
         
         
          return stackPane;
-    
-            
     }
     /**
      * @param args the command line arguments

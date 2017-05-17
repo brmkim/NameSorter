@@ -2,7 +2,7 @@
  *  ExtensionFileFilter.java
  */
 
-package namesort;
+package NameSort;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 /**
