@@ -28,6 +28,7 @@ package NameSort;
  */
 public class Sorts 
 {
+    static final int NUMBER = 10; // number to decide whether to use quick sort or insertion sort 
     public static void quickSort(String[] array) 
             throws java.lang.ArrayIndexOutOfBoundsException
     { // helpter method
@@ -36,40 +37,68 @@ public class Sorts
     public static void quickSort(String[] array, int from, int to) 
             throws java.lang.ArrayIndexOutOfBoundsException 
     {
-        if (from < to)
+        int index = partition(array, from, to);
+        // Sort left part of the index by either quickSort (n > 3)
+        // or insertionSort (n <= 3)
+        if ((index - from) > 3)
         {
-            int mid = partition(array, from, to);
-            quickSort(array, from, mid);
-            quickSort(array, mid + 1, to);
+            if (from < index)
+                quickSort(array, from, index);
+            if (index < to)
+                quickSort(array, index + 1, to);
         }
+        else
+            insertionSort(array, from, index);
+        // Now sort right part of the index by either quickSort (n > 3)
+        // or insertionSort (n <= 3)
+        index = partition(array, index + 1, to);
+        if ( (to - index) > 3)
+        {
+            if (from < index)
+                quickSort(array, from, index);
+            if (index < to)
+                quickSort(array, index + 1, to);
+        }
+         else
+            insertionSort(array, from, index);
+
     }
     private static int partition(String[] array, int from, int to) 
             throws  java.lang.ArrayIndexOutOfBoundsException         
     {// " which sets a midpoint, calls sortFirstMiddleLast, moves data around 
         //the pivot value, and returns the pivot index
-        int returnVal = 0;
-        String pivot = array[from];  
-        int i = from - 1;
-        int j = to + 1;
-        boolean neg = false;
-        if (array[i].compareTo(pivot) < 0)
-            neg = true; //
-        else
-            neg = false;   //(array[j].compareTo(pivot) > 0)
-        // below needs to be inside one loop?
-        do
-        {
-            i += 1;
-        } while (neg);
-        do
-        {
-            j -= 1;
-        } while (neg);
+        int mid = (from + to) / 2;
+        sortFirstMiddleLast(array, from, mid, to);
         
-        if (i >= j)
-            returnVal = j;
-        //swap(array[i], array[j]);
-        return returnVal;
+        int i = from;
+        int j = to;
+        mid = (from + to) / 2;
+        // while lower index is less or equal to upper index
+        while (i <= j)
+        {  
+            // while value at ith is lower than value at mid, 
+            // proceed to the right
+            while (array[i].compareTo(array[mid]) < 0)
+                i++;
+            // while value at jth is higher than value at mid, 
+            // proceed to the left
+            while (array[j].compareTo(array[mid]) > 0)
+                j--;
+            // if value in the lower index is greater or equal to the one in
+            // the upper index AND is also greater or equal to the value 
+            // in the mid point, swap the values in the lower and upper index!
+            // (Or simply to put: array[i] >= array[mid] >= array[j] )
+            if ( (array[i].compareTo(array[j]) > 0 
+                  || array[i].compareTo(array[j]) == 0)
+                    && 
+                (array[i].compareTo(array[mid]) > 0 
+                  || array[i].compareTo(array[mid]) == 0))
+                swap(array, i, j);
+            // index continue proceeding in their directions
+            i++;
+            j--;
+        }
+        return mid;
     }
     public static void insertionSort(String[] array, int from, int to)  
 throws java.lang.ArrayIndexOutOfBoundsException 
@@ -81,29 +110,33 @@ throws java.lang.ArrayIndexOutOfBoundsException
             int j = 0;
             for (j = i; j > from;j--)
             {
-                if (temp.compareToIgnoreCase(array[j - i]) < 0)
+                if (temp.compareTo(array[j - 1]) < 0)
                     array[j] = array[j - 1];
                 else
                     break;
             }
             array[j] = temp;
         }
-        
     }
     private static void swap(String[] array, int from, int to)  
 throws java.lang.ArrayIndexOutOfBoundsException    
-    {// if indices not in array 
-        
-        // fixed it later (just wrote it arbitrarily
-        String temp = "";
+    {
+        String temp = new String();
         temp = array[from];
         array[from] = array[to];
         array[to] = temp;
     }
-    private static void sortFirstMiddleLast(Comparable[] array, int from, 
+    private static void sortFirstMiddleLast(String[] array, int from, 
 int mid, int to)  throws java.lang.ArrayIndexOutOfBoundsException  
     {
-        
-    }
-            
+        int i = from;
+        int j = to;
+        String midVal = array[mid]; 
+        if (array[i].compareTo(midVal) > 0)
+            swap(array, i, mid);
+        if (array[mid].compareTo(array[j]) > 0)
+            swap(array, j, mid);
+        if(array[i].compareTo(array[j]) > 0)
+            swap(array, i, j);
+    }            
 }

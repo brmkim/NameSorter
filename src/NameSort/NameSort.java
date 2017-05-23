@@ -127,7 +127,6 @@ public class NameSort extends Application {
         // "Only one RadioButton can be selected when placed in a ToggleGroup"
         ToggleGroup group = new ToggleGroup();  
         RadioButton firstNameRB = new RadioButton("First Name");
-        //firstNameRB.setText("First Name");
         firstNameRB.setToggleGroup(group);
         RadioButton lastNameRB = new RadioButton("Last Name"); 
         lastNameRB.setToggleGroup(group);
@@ -160,9 +159,16 @@ public class NameSort extends Application {
         
         stackPane.getChildren().add(textArea);
         stackPane.setAlignment(Pos.CENTER);
-        
-        // Removing an empty line:
-        // usign Iterator to avoid ConcurrentModificationException by removing
+               
+//        Name[] nameArray = new Name[al.size()];
+//        nameArray = al.toArray(nameArray);
+//        Sorts.quickSort(nameArray);
+
+
+        ArrayList<String> lastNames = new ArrayList<>();
+        ArrayList<String> firstNames = new ArrayList<>();  
+    // Removing an empty line:  usign Iterator to avoid 
+        // ConcurrentModificationException by removing
         // an element in an ArrayList
         Iterator<String> iter = al.iterator();
         while (iter.hasNext())
@@ -178,11 +184,7 @@ public class NameSort extends Application {
                 e.getMessage();
             }
         }
-//        for (String s: al)
-//            System.out.println(s);
-        // Isolate the last name    
-        ArrayList<String> lastNames = new ArrayList<>();
-        ArrayList<String> firstNames = new ArrayList<>();   
+         // Isolate the last name           
         for (String str2: al)
         {
             try
@@ -196,7 +198,6 @@ public class NameSort extends Application {
             try
             {
                 wsIndex = str3.lastIndexOf(' ');
-
                 // if the length of the element is 1, 
                 // it's considered as having only the first name
                 if (wsIndex < 0)
@@ -209,17 +210,21 @@ public class NameSort extends Application {
             }
             catch (NullPointerException e){}
         }
-        // test printing
-        for (String fn: firstNames)
-        {    textArea.appendText(fn + "\n");//  System.out.println("Last name: " + a);
-            for (String ln: lastNames)
-            {     
-              textArea.appendText(ln + "\n");
-              Name nameObj = new Name(fn, ln);
-            }
-        }         
-        // now sort!
+//        // test printing
+//        for (String fn: firstNames)
+//            textArea.appendText(fn + "\n");//  System.out.println("Last name: " + a);
+//        for (String ln: lastNames)
+//            textArea.appendText(ln + "\n");
         
+        // Create array of Name object, put Strings of first and last names 
+        // inside the array
+        Name[] nameArray = new Name[al.size()];        
+        for (int i = 0; i < al.size(); i++)
+            nameArray[i] = new Name(firstNames, lastNames);
+        // printing test
+        for (Name n: nameArray)
+            textArea.appendText(n + "\n");
+        // now sort!
         
          return stackPane;
     }

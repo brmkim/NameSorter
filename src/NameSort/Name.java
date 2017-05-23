@@ -3,6 +3,7 @@ package NameSort;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,14 +19,16 @@ import java.util.logging.Logger;
  */
 public class Name implements Serializable, Cloneable, Comparable
 {
-    private String firstName = "";
-    private String lastName = "";
-    private static String selectedField = "";
-    private final static String byFirst = "byFirst";
-    private final static String byLast = "byLast";
+    
+    
     public Name()
     {
         //defualt constructor
+    }
+    public Name(ArrayList<String> fnAL, ArrayList<String> lnAL)
+    {
+        firstNames = fnAL;
+        lastNames = lnAL;
     }
     public Name(String fn, String ln)
     {// "a constructor with two String parameters (first and last name) 
@@ -85,5 +88,11 @@ public class Name implements Serializable, Cloneable, Comparable
         }
         return cloned;
     }
-    
+    private ArrayList<String> lastNames = new ArrayList<>();
+    private ArrayList<String> firstNames = new ArrayList<>();  
+    private String firstName = "";
+    private String lastName = "";
+    private static String selectedField = "";
+    private final static String byFirst = "byFirst";
+    private final static String byLast = "byLast";
 }
