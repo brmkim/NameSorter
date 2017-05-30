@@ -1,81 +1,125 @@
 package NameSort;
 
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
+ * filename: Name.java 
+ * class: Name 
+ * Description: Name class 
  *
- * @author boram
+ * @author Boram Kim
+ * @version 1.1
+ *
+ * Compiler: Java 8 <br>
+ * OS: Windows 10 <br>
+ * Hardware: HP Laptop <br>
+ * @author Boram Kim
+ *
+ * Log: 
+ * 05/20/2017 BK Finished version 1 
+ * 05/29/2017 BK Decided not to use the equals method to remove duplicate names
+ *               Instead doing the duplicate removal process right in the 
+ *               FileIO class upon loading the file 
  */
 public class Name implements Serializable, Cloneable, Comparable
-{
+{    
+    static NameSort nameSortObj = new NameSort();
+    private final static String BYFIRST = "byFirst";
+    private final static String BYLAST = "byLast";
+    private String firstName = "";
+    private String lastName = "";
+    private static String selectedField = BYLAST; // default
     
-    
-    public Name()
-    {
-        //defualt constructor
-    }
-    public Name(ArrayList<String> fnAL, ArrayList<String> lnAL)
-    {
-        firstNames = fnAL;
-        lastNames = lnAL;
-    }
+    /**
+     * Default constructor
+     */
+    public void Name(){ }
+    /**
+     * Name constructor that uses two string parameters: one for first and
+     * the other one for last name. Last name is selected as default globally.
+     * @param fn first name string
+     * @param ln last name string
+     */
     public Name(String fn, String ln)
-    {// "a constructor with two String parameters (first and last name) 
-        //have the last name be the default selected field. 
-        selectedField = byLast;
+    {
         firstName = fn;
-        lastName = ln;
+        lastName = ln;       
     }
+    /**
+     * Mutator for selection of name cue to be sorted by
+     * @param selected string that indicates either first or last
+     */
     public static void setName(String selected) 
     {
-        if (selected.equals("byFirst"))
-            selectedField = byFirst;
+        if (selected.equals(BYFIRST))
+            selectedField = BYFIRST;
         else
-            selectedField = byLast;            
+            selectedField = BYLAST;            
     }
+    /**
+     * CompareTo method that compares by either first or last name as
+     * selected by the user. It returns -1 if the current object comes before,
+     * 0 if equal, 1 if it comes after. Utilizes the compareToIgnoreCase method
+     * of the String properties. 
+     * @param o
+     * @return
+     * @throws ClassCastException 
+     */
     @Override
     public int compareTo(Object o)  throws ClassCastException 
-    { // returns -1 if the current object comes before, 
-      // 0 if equal, 1 if it comes after. Utilizes the 
-      // compareToIgnoreCase method of the String properties. 
-      // throws a ClassCastException if the two objects are not both Names.
+    { 
+        Name objName = (Name) o;
+        if (!(objName instanceof Name))
+            throw new ClassCastException();
         int returnVal = 0;
-        if (selectedField.equals(byFirst))
-            returnVal = firstName.compareToIgnoreCase((String) o);
-        else
-            returnVal = lastName.compareToIgnoreCase((String) o);
-//     
+        if (selectedField.equals(BYFIRST))
+            returnVal = firstName.compareToIgnoreCase(objName.firstName);
+        else if (selectedField.equals(BYLAST))
+            returnVal = lastName.compareToIgnoreCase(objName.lastName);
+        
         return returnVal;
     }
+    /**
+     * Overriding toString method. Prints "first last" format or "last, first"
+     * format
+     * @return string object 
+     */
     @Override
     public String toString()
     {  // " returns a String in the format “Last, First” if last is the 
       // selected field; “First Last” otherwise. "
         String returnStr = "";
-        if (selectedField.equals(byFirst))
+        if (selectedField.equals(BYFIRST))
+            returnStr = firstName + " " + lastName; 
+        else if (selectedField.equals(BYLAST))
             returnStr = lastName + ", " + firstName;
-        else
-            returnStr = firstName + " " + lastName;
         return returnStr;
-    }
+    }    
+    /**
+     * Compare if first name and last names are equal 
+     * NOTE: THIS IS INCOMPLETE and UNUSED
+     *   REMOVING DUPLICATE IS DONE IN FILEIO CLASS
+     * @param o comparing string object 
+     * @return boolean value
+     */
     @Override
     public boolean equals(Object o)
     {// to compare names if they are equal   
-        return  this.firstName.toLowerCase().equals(o);
+        if (o == null)
+            return false;
+        else if (!(o instanceof String))
+            return false;
+        return  this.firstName.toLowerCase().equals(o) 
+                && this.lastName.toLowerCase().equals(o);
     }
+    /**
+     * Overriding clone method. Clones name array to be sorted so that  
+     * the original name array won't be changed
+     * @return Name object
+     * @throws CloneNotSupportedException 
+     */
     @Override
-    public Name clone() 
+    public Name clone() throws CloneNotSupportedException 
     { // returns a copy of the name. 
         Name cloned;
         try
@@ -88,11 +132,4 @@ public class Name implements Serializable, Cloneable, Comparable
         }
         return cloned;
     }
-    private ArrayList<String> lastNames = new ArrayList<>();
-    private ArrayList<String> firstNames = new ArrayList<>();  
-    private String firstName = "";
-    private String lastName = "";
-    private static String selectedField = "";
-    private final static String byFirst = "byFirst";
-    private final static String byLast = "byLast";
 }

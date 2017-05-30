@@ -1,31 +1,43 @@
 package NameSort;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
+ * filename: FileIO.java 
+ * class: FileIO 
+ * Description: Opens text file containing names, trim white spaces,
+ * remove duplicate entries and finally add it into an ArrayList of Name
  *
- * @author boram
+ * @author Boram Kim
+ * @version 1.1
+ *
+ * Compiler: Java 8 <br>
+ * OS: Windows 10 <br>
+ * Hardware: HP Laptop <br>
+ * @author Boram Kim
+ *
+ * Log: 
+ * 05/20/2017 BK Finished version 1 
+ * 05/29/2017 BK Added loops to remove duplicate entries here because
+ *               doing it using for loop with ArrayList of String is far easier
+ *               than handling Name array and Name object
  */
 public class FileIO 
 {
     File file;
-   File openFile(Stage stage)
+    /**
+     * Open text file which contains names
+     * @param stage JavaFX state
+     * @return File object
+     * @throws FileNotFoundException 
+     */
+    File openFile(Stage stage) throws FileNotFoundException
     {
         String fname = "";
         
@@ -34,56 +46,93 @@ public class FileIO
         fc.setTitle("Open");
         String currentDir = System.getProperty("user.dir")
                  + File.separator;
-        StringBuilder sb = null;
         fc.setInitialDirectory(new File(currentDir));
-        // or fx.setInitialDirectory(new File("."));
-//        fc.getExtensionFilters().addAll(
-//            new FileChooser.ExtensionFilter("Dictionary Files", 
-//                    new String[] {"*.Dic", "*.DIC", "*.dic"})); 
         fc.initialDirectoryProperty();
-       // File selectedFile = fc.showOpenDialog(stage);
+        fc.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Text Files", 
+                    new String[] {"*.TXT", "*.Txt", "*.txt"})); 
         file = fc.showOpenDialog(stage);
-        // creating an ArrayList because the getJumble event handler calls
-        // this method that also calls readDic method which returns ArrayList
         try
-        {// check before reading dic file
-            if (file.exists() && file.canRead());
-                readFile(file); 
+        {// check before reading file
+            if (file.exists() || file.canRead());
+                readFile(file);
         }
-        catch (NullPointerException e)
-        {
-            // how to handle it?
-        }
+        catch (NullPointerException e) { e.getMessage();}
+        
         return file;
     }
-    ArrayList<String> readFile(File selectedFile)
+    /**
+     * Read text file and remove any white space and duplicate entry, and
+     * put it into an ArrayList of Name that contains separated first and 
+     * last names on each object
+     * @param selectedFile File object
+     * @return ArrayList of Name objects
+     */
+    ArrayList<Name> readFile(File selectedFile)
     {
-        ArrayList<String> namesAL = new ArrayList<>();
-        // return value was StringBuilder
-        StringBuilder sb = new StringBuilder();   
-        String currentLine = "";
-        
+        ArrayList<String> strAL = new ArrayList<>();
+        ArrayList<String> strALnoDuplicate = new ArrayList<>();
+        ArrayList<Name> nameAL = new ArrayList<>();
+        BufferedReader br;
+        int wsIndex = 0;  // index of white space between first & last 
         try
         {
-            BufferedReader br;
-            try (FileReader fr = new FileReader(selectedFile)) 
+            try 
             {
-                br = new BufferedReader(fr);
-                while(currentLine != null)                
-                { // while the currentLine is not null, read the line from the
-                    // BufferedREader as string, and append it to ArrayList
-                    currentLine = br.readLine();
-                    namesAL.add(currentLine);
-                }
-                fr.close();
-            }
-            br.close();  // gotta close FileReader and BufferedReader!
-        }
-        catch (IOException ex) 
+                br = new BufferedReader(new FileReader(file));
+                String line;
+                try 
+                {
+                    while ((line = br.readLine()) != null)
+                    {
+                        String temp = line.trim(); // first trim the string
+                        if (!temp.equals(""))  // remove the empty line in list
+                            strAL.add(temp);
+                    }  
+                    br.close();
+                } catch (IOException ex) { ex.getMessage(); }
+            } catch (FileNotFoundException ex) { ex.getMessage(); }
+        }catch (NullPointerException e) { e.getMessage();}
+         
+        // Remove duplicate: this might be inefficient but works
+        for (int i = 0; i < strAL.size(); i++)
         {
-            ex.getMessage();
+            String thisName = strAL.get(i);     
+            for (int j = 0; j < strAL.size(); j++)
+            {
+                String thatName = strAL.get(j);
+                if (i == j || thisName.equals(thatName))
+                    break;
+            }
+            if(!strALnoDuplicate.contains(thisName))
+                strALnoDuplicate.add(thisName);
         }
-
-        return namesAL;
+        // Now create ArrayList<Name>
+        final char SPACECHAR = ' ';
+        for (int n = 0; n < strALnoDuplicate.size(); n++) 
+        {
+            try 
+            {// set white space as a boundary between first and last names
+                wsIndex = strALnoDuplicate.get(n).lastIndexOf(SPACECHAR);
+                
+                
+                // If the length of the element is 1, 
+                // it's considered as having only the last name. 
+                // It's first name then is a single white space
+                if (wsIndex < 0) 
+                {
+                    nameAL.add(new Name(" ",
+                            strALnoDuplicate.get(n).substring(wsIndex + 1)));
+                } 
+                else 
+                {
+                    // put first name then last name into ArrayList<Name>
+                    nameAL.add(new Name(strALnoDuplicate.get(n).substring(0, wsIndex), 
+                    strALnoDuplicate.get(n).substring(wsIndex + 1)));
+                }
+            } catch (NullPointerException e) { e.getMessage(); }
+        }
+       
+        return nameAL;    
     }
 }
